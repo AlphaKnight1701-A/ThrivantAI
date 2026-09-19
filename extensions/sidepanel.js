@@ -5,7 +5,8 @@ let filePayload = null;
 const templates = {
   legacy: 'Lead with continuity, gratitude, trust built over time, and a calm in-person advisory experience. Avoid unnecessary jargon or pressure.',
   spanish: 'Use warm, natural Spanish first. Be respectful, plain-spoken, culturally aware, and make room for family questions and decision-making.',
-  family: 'Center the conversation on family, shared values, stewardship, legacy, and the people the member wants to protect.'
+  family: 'Center the conversation on family, shared values, stewardship, legacy, and the people the member wants to protect.',
+  transition: 'Lead with empathy and patience. Acknowledge change before financial topics, identify practical next steps, and avoid assuming what the member needs.'
 };
 
 chrome.storage.local.get(['geminiApiKey'], ({ geminiApiKey }) => { if (geminiApiKey) $('apiKey').value = geminiApiKey; });
@@ -33,11 +34,11 @@ function renderMarkdown(text) { let s = escapeHtml(text); s = s.replace(/^### (.
 
 $('meetingForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  const key = $('apiKey').value.trim();
+  const key = $('Key').value.trim();
   if (!key) { $('settings').classList.remove('hidden'); $('apiKey').focus(); return; }
   const button = document.querySelector('.generate'); button.disabled = true; button.innerHTML = 'Creating trusted talking points…';
   const memberName = $('memberName').value.trim();
-  const prompt = `You are ThriveAI, a thoughtful assistant that helps Thrivent financial advisors prepare for a meeting. Create a concise, human, relationship-first MEETING BRIEF. This is preparation support, not financial advice. Never invent account balances, suitability, performance, or personal facts. Give 5 sections in this exact friendly format: ### Connection opener, ### Personalized talking points, ### Questions to listen for, ### Bilingual phrasing, ### Advisor guardrails. Under talking points and questions, use bullet lists.\n\nMember: ${memberName}\nMeeting: ${$('meetingType').value}\nMember preference: ${$('memberPreference').value}\nLanguage requested: ${$('language').value}\nAdvisor context: ${$('context').value || 'No additional notes provided.'}\nConversation approach: ${templates[selectedTemplate]}\n\nFor bilingual phrasing, give 3 short pairs in English and natural neutral Spanish. Prioritize dignity, clarity, family inclusion, and a trusted in-person relationship. If the attached member notes conflict with the stated context, flag that gently rather than assume.`;
+  const prompt = `You are ThriveAI, a thoughtful assistant that helps Thrivent financial advisors prepare for a meeting. Create a concise, human, relationship-first MEETING BRIEF. This is preparation support, not financial advice. Never invent account balances, suitability, performance, or personal facts. Use only stated information. Do not infer financial needs, risk tolerance, immigration status, beliefs, or preferences from country/region of origin, language, ethnicity, or family structure. Country/region may only guide respectful language, cultural curiosity, and an invitation for the client to tell the advisor what matters. Give 5 sections in this exact friendly format: ### Connection opener, ### Personalized talking points, ### Questions to listen for, ### Bilingual phrasing, ### Advisor guardrails. Under talking points and questions, use bullet lists.\n\nMember: ${memberName}\nMeeting: ${$('meetingType').value}\nMember preference: ${$('memberPreference').value}\nLanguage requested: ${$('language').value}\nLife stage: ${$('lifeStage').value}\nCountry/region of origin, if stated by member: ${$('origin').value || 'Not provided'}\nClient intelligence: ${$('context').value || 'No additional notes provided.'}\nAdvisor intelligence: ${$('advisorIntel').value || 'No advisor intelligence provided.'}\nConversation approach: ${templates[selectedTemplate]}\n\nFor bilingual phrasing, give 3 short pairs in English and natural neutral Spanish. Prioritize dignity, clarity, family inclusion, and a trusted in-person relationship. If the attached member notes conflict with the stated context, flag that gently rather than assume.`;
   const parts = [{ text: prompt }];
   if (filePayload) parts.push({ inline_data: { mime_type: filePayload.mimeType, data: filePayload.data } });
   try {

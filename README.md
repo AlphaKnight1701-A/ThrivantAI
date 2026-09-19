@@ -5,10 +5,12 @@ A Chrome/Edge extension prototype for Thrivent advisors. It creates relationship
 ## Run it locally
 
 1. Open `chrome://extensions` (or `edge://extensions`) and enable **Developer mode**.
-2. Choose **Load unpacked** and select this folder: `C:\Users\david\Downloads\Local Repos\ThrivantAI`.
-3. Visit a Thrivent site, click the ThriveAI floating button or the extension icon, then paste a Gemini API key in the settings control.
+2. Choose **Load unpacked** and select this exact extension folder: `C:\Users\david\Downloads\Local Repos\ThrivantAI\extensions`.
+   That folder directly contains `manifest.json`, `sidepanel.html`, and the extension scripts. Do **not** select the parent `ThrivantAI` folder.
+3. Optional local secret setup: copy `.env.example` to `.env`, then put your key after `GEMINI_API_KEY=`. This is a local developer record only; a browser extension cannot securely read `.env` at runtime.
+4. Visit a Thrivent site, click the ThriveAI floating button or the extension icon. In the side panel, click the **gear icon (top right)**, paste the same Gemini key into **Gemini API key**, and click **Save key**.
 
-The key stays in the browser's extension storage. Uploaded documents are sent directly to Gemini only when the advisor chooses **Create personalized talking points**.
+The runtime key stays in the browser's extension storage. Uploaded documents are sent directly to Gemini only when the advisor chooses **Create personalized talking points**. For a production launch, route Gemini calls through a secured company backend; never package a shared production key into an extension.
 
 ## Product answer
 

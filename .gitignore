@@ -1,0 +1,5 @@
+# Local credentials — never commit this file.
+.env
+
+# Browser extension packages
+*.zip
