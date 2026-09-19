@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "ThriveAI | Advisor Meeting Companion",
+  "version": "1.0.0",
+  "description": "Prepare trusted, personalized and bilingual meeting talking points for Thrivent advisors.",
+  "action": { "default_title": "Open ThriveAI" },
+  "side_panel": { "default_path": "sidepanel.html" },
+  "permissions": ["storage", "sidePanel"],
+  "host_permissions": ["https://*.thrivent.com/*", "https://generativelanguage.googleapis.com/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [{
+    "matches": ["https://*.thrivent.com/*"],
+    "js": ["content.js"],
+    "css": ["content.css"],
+    "run_at": "document_idle"
+  }]
+}

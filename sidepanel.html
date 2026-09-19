@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ThriveAI</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <main class="shell">
+    <header><div class="brand-mark">✦</div><div><p class="eyebrow">THRIVENT ADVISOR TOOLS</p><h1>Thrive<span>AI</span></h1></div><button id="settingsButton" class="icon-button" title="Gemini setup">⚙</button></header>
+    <section id="settings" class="settings hidden"><label>Gemini API key <input id="apiKey" type="password" placeholder="Paste your Gemini API key"></label><div class="setting-actions"><small>Stored only in this browser.</small><button id="saveKey" class="text-button">Save key</button></div></section>
+    <section class="hero"><div class="hero-icon">♡</div><div><h2>Bring every member closer</h2><p>Prepare a relationship-first, culturally responsive conversation in minutes.</p></div></section>
+    <form id="meetingForm">
+      <div class="section-label"><span>1</span> Member & meeting</div>
+      <div class="grid">
+        <label>Member name<input id="memberName" placeholder="e.g., Maria and José Rivera" required></label>
+        <label>Meeting type<select id="meetingType"><option>Annual review</option><option>Retirement planning</option><option>Legacy & estate conversation</option><option>New member introduction</option><option>Life transition check-in</option></select></label>
+      </div>
+      <div class="grid">
+        <label>Member preference<select id="memberPreference"><option value="legacy">Legacy / relationship-first</option><option value="spanish">Native Spanish speaker</option><option value="bilingual">Bilingual household</option><option value="general">General member</option></select></label>
+        <label>Language<select id="language"><option value="English">English</option><option value="Spanish">Spanish</option><option value="Bilingual English & Spanish">Bilingual: English + Spanish</option></select></label>
+      </div>
+      <label>What should the advisor know?<textarea id="context" rows="4" placeholder="Family milestones, financial goals, prior conversations, concerns, or values…"></textarea></label>
+      <div class="upload-row"><input id="document" type="file" accept=".txt,.md,.csv,.pdf,.doc,.docx"><label for="document" class="upload-button">↑ Upload member notes</label><span id="fileName">Optional: PDF, Word, or text</span></div>
+      <div class="section-label"><span>2</span> Generate a brief</div>
+      <div class="quick-prompts" role="group" aria-label="Quick prompt"><button type="button" data-template="legacy">Honor long-term trust</button><button type="button" data-template="spanish">Spanish-first conversation</button><button type="button" data-template="family">Family & legacy focus</button></div>
+      <button class="generate" type="submit"><span>✦</span> Create personalized talking points</button>
+    </form>
+    <section id="output" class="output hidden" aria-live="polite"><div class="output-head"><div><p class="eyebrow">MEETING BRIEF</p><h2 id="outputTitle">Your advisor brief</h2></div><button id="copyButton" class="text-button">Copy</button></div><div id="result"></div></section>
+    <p class="disclaimer">ThriveAI supports preparation—not financial advice. Verify all recommendations and suitability requirements before meeting with a member.</p>
+  </main><script src="sidepanel.js"></script>
+</body></html>
