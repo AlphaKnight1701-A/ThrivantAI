@@ -51,7 +51,8 @@ $('meetingForm').addEventListener('submit', async (event) => {
   const parts = [{ text: prompt }];
   if (filePayload) parts.push({ inline_data: { mime_type: filePayload.mimeType, data: filePayload.data } });
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{parts}], generationConfig:{temperature:.55,maxOutputTokens:1200} }) });
+    // Gemini 2.0 Flash was retired; use the currently available Flash model.
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{parts}], generationConfig:{temperature:.55,maxOutputTokens:1200} }) });
     const body = await response.json();
     if (!response.ok) throw new Error(body.error?.message || 'Gemini could not generate the brief.');
     const text = body.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || 'No meeting brief was returned.';
