@@ -30,7 +30,27 @@ $('document').addEventListener('change', async (event) => {
 
 function arrayBufferToBase64(buffer) { let binary = ''; const bytes = new Uint8Array(buffer); for (let i=0; i<bytes.length; i+=8192) binary += String.fromCharCode(...bytes.subarray(i,i+8192)); return btoa(binary); }
 function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-function renderMarkdown(text) { let s = escapeHtml(text); s = s.replace(/^### (.*)$/gm,'<h3>$1</h3>').replace(/^## (.*)$/gm,'<h3>$1</h3>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>'); s = s.replace(/(?:^|\n)[•*-] (.*)(?=(?:\n[•*-] |\n\n|$))/g,'<li>$1</li>'); s = s.replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>').replace(/<\/ul>\s*<ul>/g,''); return s.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>'); }
+const briefSections = [
+  'Meeting objective', 'How to greet and open', 'What to mention',
+  'Recommended conversation flow', 'Questions to listen for', 'Advisor recommendations',
+  'Bilingual phrasing', 'Close and follow-up', 'Advisor guardrails'
+];
+function normalizeHeading(value) { return value.toLowerCase().replace(/[^a-z0-9]/g, ''); }
+function renderBrief(text) {
+  const headings = [...text.matchAll(/^#{2,3}\s+(.+)$/gmi)];
+  const returned = new Map();
+  headings.forEach((match, index) => {
+    const bodyStart = match.index + match[0].length;
+    const bodyEnd = index + 1 < headings.length ? headings[index + 1].index : text.length;
+    returned.set(normalizeHeading(match[1]), text.slice(bodyStart, bodyEnd).trim());
+  });
+  return briefSections.map(title => {
+    const body = returned.get(normalizeHeading(title));
+    if (!body) return `<section class="brief-section"><h3>${title}</h3><p class="empty-section">No response generated for this section. Use the member context and advisor judgment to complete it.</p></section>`;
+    const items = body.split('\n').map(line => line.trim()).filter(Boolean).map(line => line.replace(/^[-*•]\s*/, ''));
+    return `<section class="brief-section"><h3>${title}</h3><ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>`;
+  }).join('');
+}
 
 $('meetingForm').addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -98,11 +118,11 @@ If the attached notes conflict with the stated information, flag the discrepancy
   if (filePayload) parts.push({ inline_data: { mime_type: filePayload.mimeType, data: filePayload.data } });
   try {
     // Gemini 2.0 Flash was retired; use the currently available Flash model.
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{parts}], generationConfig:{temperature:.55,maxOutputTokens:1200} }) });
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${encodeURIComponent(key)}`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ contents:[{parts}], generationConfig:{temperature:.55,maxOutputTokens:2400} }) });
     const body = await response.json();
     if (!response.ok) throw new Error(body.error?.message || 'Gemini could not generate the brief.');
     const text = body.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || 'No meeting brief was returned.';
-    $('outputTitle').textContent = `${memberName} · meeting brief`; $('result').innerHTML = renderMarkdown(text); $('output').classList.remove('hidden');
+    $('outputTitle').textContent = `${memberName} · meeting brief`; $('result').innerHTML = renderBrief(text); $('output').classList.remove('hidden');
   } catch (error) { $('outputTitle').textContent = 'Could not create brief'; $('result').textContent = error.message; $('output').classList.remove('hidden'); }
   finally { button.disabled = false; button.innerHTML = '<span>✦</span> Create personalized talking points'; }
 });
